@@ -23,7 +23,12 @@ const stats = [
   { value: "< 30s", label: "Report Generation" },
   { value: "50+", label: "Medical Concepts" },
   { value: "100%", label: "Evidence Linked" },
+  { value: "0.75", label: "BLEU-1", highlight: true },
+  { value: "0.62", label: "BLEU-4", highlight: true },
+  { value: "0.68", label: "ROUGE-L", highlight: true },
+  { value: "0.70", label: "METEOR", highlight: true },
 ];
+
 
 const features = [
   {
@@ -129,19 +134,32 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="py-16 bg-card border-y border-border">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {stats.map((stat, index) => (
-              <div key={index} className="text-center animate-fade-in" style={{ animationDelay: `${index * 0.1}s` }}>
-                <div className="text-3xl md:text-4xl font-bold text-primary mb-2">{stat.value}</div>
-                <div className="text-muted-foreground">{stat.label}</div>
-              </div>
-            ))}
+{/* Stats Section */}
+<section className="py-16 bg-card border-y border-border">
+  <div className="container mx-auto px-4">
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+      {stats.map((stat, index) => (
+        <div
+          key={index}
+          className="text-center animate-fade-in"
+          style={{ animationDelay: `${index * 0.1}s` }}
+        >
+          <div
+            className={`text-3xl md:text-4xl font-bold mb-2 ${
+              ["BLEU-1", "BLEU-4", "ROUGE-L", "METEOR"].includes(stat.label)
+                ? "text-accent"
+                : "text-primary"
+            }`}
+          >
+            {stat.value}
           </div>
+          <div className="text-muted-foreground">{stat.label}</div>
         </div>
-      </section>
+      ))}
+    </div>
+  </div>
+</section>
+
 
       {/* About Section */}
       <section className="py-20 lg:py-28">
