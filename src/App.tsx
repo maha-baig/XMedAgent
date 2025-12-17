@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import PatientDashboard from "./pages/PatientDashboard";
 import UploadXray from "./pages/UploadXray";
+import ExplainabilityModule from "./pages/ExplainabilityModule";
 import KnowledgeGraph from "./pages/KnowledgeGraph";
 import ImageMapping from "./pages/ImageMapping";
 import NotFound from "./pages/NotFound";
@@ -22,6 +23,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/patients" element={<PatientDashboard />} />
           <Route path="/upload" element={<UploadXray />} />
+          <Route path="/explainability" element={<ExplainabilityModule />} />
           <Route path="/knowledge-graph" element={<KnowledgeGraph />} />
           <Route path="/image-mapping" element={<ImageMapping />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

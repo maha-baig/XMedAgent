@@ -1,6 +1,15 @@
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Activity, Upload, Network, FileImage, Menu, X, Users } from "lucide-react";
+import {
+  Activity,
+  Upload,
+  Network,
+  FileImage,
+  Menu,
+  X,
+  Users,
+  FileSearch,
+} from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 
@@ -8,6 +17,7 @@ const navItems = [
   { path: "/", label: "Home", icon: Activity },
   { path: "/patients", label: "Patients", icon: Users },
   { path: "/upload", label: "Upload X-ray", icon: Upload },
+  { path: "/explainability", label: "Explainability", icon: FileSearch },
   { path: "/knowledge-graph", label: "Knowledge Graph", icon: Network },
   { path: "/image-mapping", label: "Image Mapping", icon: FileImage },
 ];
@@ -35,7 +45,9 @@ export const Navbar = () => {
             {navItems.map((item) => (
               <Link key={item.path} to={item.path}>
                 <Button
-                  variant={location.pathname === item.path ? "default" : "ghost"}
+                  variant={
+                    location.pathname === item.path ? "default" : "ghost"
+                  }
                   size="sm"
                   className={cn(
                     "gap-2",
@@ -65,9 +77,15 @@ export const Navbar = () => {
           <div className="md:hidden py-4 animate-slide-up">
             <div className="flex flex-col gap-2">
               {navItems.map((item) => (
-                <Link key={item.path} to={item.path} onClick={() => setIsOpen(false)}>
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  onClick={() => setIsOpen(false)}
+                >
                   <Button
-                    variant={location.pathname === item.path ? "default" : "ghost"}
+                    variant={
+                      location.pathname === item.path ? "default" : "ghost"
+                    }
                     className="w-full justify-start gap-2"
                   >
                     <item.icon className="w-4 h-4" />
