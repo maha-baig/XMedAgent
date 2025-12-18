@@ -1,23 +1,35 @@
-# local_radiology_agent.py
+# vision.py
 
 import os
 import torch
 import numpy as np
 import torch.nn as nn
 import torch.nn.functional as F
+import warnings
+import re
 from PIL import Image
 from torchvision import transforms
 import timm
-from langchain_community.chat_models import ChatLiteLLM  # <-- Use this instead of Ollama
+from langchain_community.chat_models import ChatOllama
+
+# Suppress warnings
+warnings.filterwarnings("ignore", category=FutureWarning)
+warnings.filterwarnings("ignore", category=UserWarning)
 
 # -------------------------------
 # Device
 # -------------------------------
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+if torch.cuda.is_available():
+    device = torch.device("cuda")
+elif torch.backends.mps.is_available():
+    device = torch.device("mps")
+else:
+    device = torch.device("cpu")
+
 print(f"Using device: {device}")
 
 # -------------------------------
-# Vision Encoder + Projection
+# Model Definitions
 # -------------------------------
 class VisionEncoderWithProjection(nn.Module):
     def __init__(self, device="cuda", vit_name="vit_base_patch16_224", embed_dim=768, dropout_prob=0.1):
@@ -40,7 +52,7 @@ class VisionEncoderWithProjection(nn.Module):
         images = images.to(self.device)
         with torch.no_grad():
             patch_tokens = self.visual_extractor.forward_features(images)
-        patch_tokens = patch_tokens[:, 1:, :]  # remove CLS token
+        patch_tokens = patch_tokens[:, 1:, :]
         visual_tokens = self.visual_projection(patch_tokens)
         return visual_tokens
 
@@ -66,7 +78,7 @@ class ProjectionHeads(nn.Module):
         return img_embeds
 
 # -------------------------------
-# Image preprocessing
+# Image Preprocessing
 # -------------------------------
 image_transform = transforms.Compose([
     transforms.Resize((224, 224)),
@@ -84,75 +96,88 @@ def preprocess_image(image_path):
 def get_visual_embeddings(image_paths, vision_model, proj_heads):
     vision_model.eval()
     proj_heads.eval()
-    images = [preprocess_image(p) for p in image_paths]
-    images = torch.cat(images).to(device)
+    
+    valid_images = []
+    for p in image_paths:
+        if os.path.exists(p):
+            valid_images.append(preprocess_image(p))
+    
+    if not valid_images:
+        return None
+
+    images = torch.cat(valid_images).to(device)
 
     with torch.no_grad():
-        patch_tokens = vision_model.extract_visual_tokens(images)  # [V, N, 768]
-        patch_tokens = patch_tokens.flatten(0,1)                   # [V*N, 768]
-        img_embeds = proj_heads.image_proj(patch_tokens)           # [V*N, 256]
-        img_embeds = img_embeds.mean(dim=0, keepdim=True)          # [1, 256]
+        patch_tokens = vision_model.extract_visual_tokens(images)
+        patch_tokens = patch_tokens.flatten(0,1)
+        img_embeds = proj_heads.image_proj(patch_tokens)
+        img_embeds = img_embeds.mean(dim=0, keepdim=True)
     return img_embeds
 
-# -------------------------------
-# Convert embeddings -> textual description
-# -------------------------------
 def embeddings_to_text(img_embed, top_k=12):
     vec = img_embed.squeeze().cpu().numpy()
     idx = np.argsort(vec)[-top_k:][::-1]
     return ", ".join([f"dim{int(i)}={vec[i]:.2f}" for i in idx])
 
 # -------------------------------
-# Local LLM Agent using ChatLiteLLM
+# GLOBAL INITIALIZATION (Fixes ImportError)
+# -------------------------------
+
+# 1. Initialize Models Globally
+vision_model = VisionEncoderWithProjection(device=device).to(device)
+proj_heads = ProjectionHeads(img_dim=768, txt_dim=384, embed_dim=256).to(device)
+
+# 2. Load Weights (Global Scope)
+# Adjust paths as needed. Using relative paths assuming execution from project root.
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJ_CKPT = os.path.join(BASE_DIR, "model_weights/Vision_Agent/proj_heads.pth")
+
+if os.path.exists(PROJ_CKPT):
+    try:
+        proj_heads.load_state_dict(torch.load(PROJ_CKPT, map_location=device))
+        print(f"✅ Loaded Projection Heads from {PROJ_CKPT}")
+    except Exception as e:
+        print(f"⚠️ Error loading projection heads: {e}")
+else:
+    print(f"⚠️ Projection checkpoint not found at {PROJ_CKPT}. Using random weights.")
+
+# Ensure models are in eval mode
+vision_model.eval()
+proj_heads.eval()
+
+# -------------------------------
+# Local LLM Agent
 # -------------------------------
 class LocalLLMReportAgent:
-    def __init__(self, model_name="ollama/deepseek-r1:1.5b"):
-        self.llm = ChatLiteLLM(model=model_name, streaming=False)
+    def __init__(self, model_name="deepseek-r1:1.5b"):
+        if model_name.startswith("ollama/"):
+            model_name = model_name.split("/", 1)[1]
+        self.llm = ChatOllama(model=model_name, temperature=0.1)
 
     def generate_report(self, visual_description):
         prompt = (
             "You are an expert thoracic radiologist. "
-            "Using the following X-ray image features, generate a formal radiology report "
-            "in narrative style (no bullet points). "
-            "Organize the report into sections:\n"
-            "FINDINGS: Describe abnormalities and normal structures.\n"
-            "IMPRESSION: Summarize diagnostic conclusions.\n"
-            "LABELS: List present conditions as words separated by commas.\n\n"
+            "Using the following X-ray image features, generate a formal radiology report...\n"
             f"Visual Features: {visual_description}\n"
-            "\n=== Start Formal Radiology Report ==="
         )
         response = self.llm.invoke(prompt)
-        return response.content if hasattr(response, "content") else str(response)
+        content = response.content if hasattr(response, "content") else str(response)
+        clean_content = re.sub(r'<think>.*?</think>', '', content, flags=re.DOTALL).strip()
+        return clean_content
 
 # -------------------------------
-# Load trained weights
+# Main Execution (Test Only)
 # -------------------------------
-vision_model = VisionEncoderWithProjection(device=device).to(device)
-proj_heads = ProjectionHeads(img_dim=768, txt_dim=384, embed_dim=256).to(device)
-
-
-proj_ckpt = r"C:\Users\User\OneDrive\Desktop\gui\XMedAgent\model_weights\proj_heads.pth"
-proj_heads.load_state_dict(torch.load(proj_ckpt, map_location=device))
-
-
-vision_model.eval()
-proj_heads.eval()
-print("✅ Vision model and projection heads loaded successfully")
-
-# -------------------------------
-# Example usage
-# -------------------------------
-image_paths = [r"C:\Users\User\OneDrive\Desktop\gui\XMedAgent\data\iu_xray\images\CXR688_IM-2256/0.png"]
-
-# Get embeddings
-img_embed = get_visual_embeddings(image_paths, vision_model, proj_heads)
-
-# Convert embeddings to textual description
-visual_desc = embeddings_to_text(img_embed)
-
-# Generate report using local LLM
-agent = LocalLLMReportAgent(model_name="ollama/deepseek-r1:1.5b")
-report = agent.generate_report(visual_desc)
-
-print("\nGenerated Radiology Report:\n")
-print(report)
+if __name__ == "__main__":
+    # This block now just tests the GLOBALLY defined models
+    print("\n--- Running Vision Module Test ---")
+    
+    test_image = "data/iu_xray/images/CXR688_IM-2256/0.png"
+    if os.path.exists(test_image):
+        emb = get_visual_embeddings([test_image], vision_model, proj_heads)
+        if emb is not None:
+            print("Embeddings generated successfully.")
+            txt = embeddings_to_text(emb)
+            print("Text desc:", txt)
+    else:
+        print(f"Test image not found at {test_image}")

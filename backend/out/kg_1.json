@@ -1,0 +1,84 @@
+{
+  "entities": [
+    [
+      "Normal",
+      "Observation::definitely present"
+    ],
+    [
+      "chest",
+      "Anatomy::definitely present"
+    ],
+    [
+      "x - XXXX",
+      "Observation::definitely present"
+    ],
+    [
+      "cardiac",
+      "Anatomy::definitely present"
+    ],
+    [
+      "silhouette",
+      "Anatomy::definitely present"
+    ],
+    [
+      "mediastinum",
+      "Anatomy::definitely present"
+    ],
+    [
+      "size",
+      "Anatomy::definitely present"
+    ],
+    [
+      "pulmonary",
+      "Anatomy::definitely present"
+    ],
+    [
+      "edema",
+      "Observation::definitely absent"
+    ],
+    [
+      "pleural",
+      "Anatomy::definitely present"
+    ],
+    [
+      "effusion",
+      "Observation::definitely absent"
+    ],
+    [
+      "pneumothorax",
+      "Observation::definitely absent"
+    ]
+  ],
+  "relations": [
+    [
+      0,
+      2,
+      "modify"
+    ],
+    [
+      2,
+      1,
+      "located_at"
+    ],
+    [
+      4,
+      3,
+      "modify"
+    ],
+    [
+      6,
+      5,
+      "modify"
+    ],
+    [
+      8,
+      7,
+      "located_at"
+    ],
+    [
+      10,
+      9,
+      "located_at"
+    ]
+  ]
+}

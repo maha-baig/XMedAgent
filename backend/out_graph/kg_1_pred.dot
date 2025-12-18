@@ -1,0 +1,38 @@
+digraph KG {
+	bgcolor=white fontname=Helvetica fontsize=11 label="Pred KG for 1.png (Frontal)" labelloc=t nodesep=0.45 overlap=false pad=0.2 rankdir=LR ranksep=0.55 splines=spline
+	node [fontname=Helvetica fontsize=10 margin="0.12,0.08"]
+	edge [arrowsize=0.8 fontname=Helvetica fontsize=9]
+	subgraph cluster_Anatomy {
+		color="#8AB4F8" fontname=Helvetica fontsize=11 label=Anatomy penwidth=1.2 style=rounded
+		n1 [label="1: chest\nAnatomy::definitely present" color="#1F7A1F" fillcolor="#E6F4E6" penwidth=1.4 shape=box style=filled]
+		n3 [label="3: cardiac\nAnatomy::definitely present" color="#1F7A1F" fillcolor="#E6F4E6" penwidth=1.4 shape=box style=filled]
+		n4 [label="4: silhouette\nAnatomy::definitely present" color="#1F7A1F" fillcolor="#E6F4E6" penwidth=1.4 shape=box style=filled]
+		n5 [label="5: mediastinum\nAnatomy::definitely present" color="#1F7A1F" fillcolor="#E6F4E6" penwidth=1.4 shape=box style=filled]
+		n6 [label="6: size\nAnatomy::definitely present" color="#1F7A1F" fillcolor="#E6F4E6" penwidth=1.4 shape=box style=filled]
+		n7 [label="7: pulmonary\nAnatomy::definitely present" color="#1F7A1F" fillcolor="#E6F4E6" penwidth=1.4 shape=box style=filled]
+		n9 [label="9: pleural\nAnatomy::definitely present" color="#1F7A1F" fillcolor="#E6F4E6" penwidth=1.4 shape=box style=filled]
+	}
+	subgraph cluster_Observation {
+		color="#81C995" fontname=Helvetica fontsize=11 label=Observation penwidth=1.2 style=rounded
+		n0 [label="0: Normal\nObservation::definitely present" color="#1F7A1F" fillcolor="#E6F4E6" penwidth=1.4 shape=ellipse style=filled]
+		n2 [label="2: x - XXXX\nObservation::definitely present" color="#1F7A1F" fillcolor="#E6F4E6" penwidth=1.4 shape=ellipse style=filled]
+		n8 [label="8: edema\nObservation::definitely absent" color="#B3261E" fillcolor="#FCE8E6" penwidth=1.4 shape=ellipse style=filled]
+		n10 [label="10: effusion\nObservation::definitely absent" color="#B3261E" fillcolor="#FCE8E6" penwidth=1.4 shape=ellipse style=filled]
+		n11 [label="11: pneumothorax\nObservation::definitely absent" color="#B3261E" fillcolor="#FCE8E6" penwidth=1.4 shape=ellipse style=filled]
+	}
+	n0 -> n2 [label=modify color="#5F6368" penwidth=1.4 style=solid]
+	n2 -> n1 [label=located_at color="#1A73E8" penwidth=1.8 style=bold]
+	n4 -> n3 [label=modify color="#5F6368" penwidth=1.4 style=solid]
+	n6 -> n5 [label=modify color="#5F6368" penwidth=1.4 style=solid]
+	n8 -> n7 [label=located_at color="#1A73E8" penwidth=1.8 style=bold]
+	n10 -> n9 [label=located_at color="#1A73E8" penwidth=1.8 style=bold]
+	subgraph cluster_legend {
+		color="#DADCE0" fontname=Helvetica fontsize=11 label=Legend style="rounded,dashed"
+		L1 [label="Anatomy\n(definitely present)" color="#1F7A1F" fillcolor="#E6F4E6" shape=box style=filled]
+		L2 [label="Observation\n(definitely absent)" color="#B3261E" fillcolor="#FCE8E6" shape=ellipse style=filled]
+		L3 [label=Uncertain color="#B26A00" fillcolor="#FFF4E0" shape=ellipse style="filled,dashed"]
+		L1 -> L2 [label=located_at color="#1A73E8" penwidth=1.8 style=bold]
+		L2 -> L3 [label=suggestive_of color="#9334E6" penwidth=1.6 style=dashed]
+		L1 -> L3 [label=modify color="#5F6368" penwidth=1.4 style=solid]
+	}
+}

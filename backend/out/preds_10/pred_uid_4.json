@@ -1,0 +1,182 @@
+{
+  "entities": [
+    [
+      "lungs",
+      "Anatomy::definitely present"
+    ],
+    [
+      "hilar",
+      "Anatomy::definitely present"
+    ],
+    [
+      "vascular",
+      "Anatomy::definitely present"
+    ],
+    [
+      "markings",
+      "Anatomy::definitely present"
+    ],
+    [
+      "heart",
+      "Anatomy::definitely present"
+    ],
+    [
+      "size",
+      "Anatomy::definitely present"
+    ],
+    [
+      "mediastinum",
+      "Anatomy::definitely present"
+    ],
+    [
+      "contour",
+      "Anatomy::definitely present"
+    ],
+    [
+      "diaphragm",
+      "Anatomy::definitely present"
+    ],
+    [
+      "angles",
+      "Anatomy::definitely present"
+    ],
+    [
+      "effusion",
+      "Observation::definitely absent"
+    ],
+    [
+      "pneumothorax",
+      "Observation::definitely absent"
+    ],
+    [
+      "bones",
+      "Anatomy::definitely present"
+    ],
+    [
+      "soft tissues",
+      "Anatomy::definitely present"
+    ],
+    [
+      "pulmonary",
+      "Anatomy::definitely present"
+    ],
+    [
+      "edema",
+      "Observation::definitely absent"
+    ],
+    [
+      "consolidation",
+      "Observation::definitely absent"
+    ],
+    [
+      "infiltrate",
+      "Observation::definitely absent"
+    ],
+    [
+      "opacity",
+      "Observation::definitely present"
+    ],
+    [
+      "right",
+      "Anatomy::definitely present"
+    ],
+    [
+      "upper lobe",
+      "Anatomy::definitely present"
+    ],
+    [
+      "calcified",
+      "Observation::definitely present"
+    ],
+    [
+      "granuloma",
+      "Observation::definitely present"
+    ],
+    [
+      "pleural",
+      "Anatomy::definitely present"
+    ]
+  ],
+  "relations": [
+    [
+      1,
+      3,
+      "modify"
+    ],
+    [
+      2,
+      3,
+      "modify"
+    ],
+    [
+      0,
+      1,
+      "located_at"
+    ],
+    [
+      0,
+      2,
+      "located_at"
+    ],
+    [
+      5,
+      4,
+      "modify"
+    ],
+    [
+      7,
+      6,
+      "modify"
+    ],
+    [
+      10,
+      9,
+      "located_at"
+    ],
+    [
+      10,
+      8,
+      "located_at"
+    ],
+    [
+      15,
+      0,
+      "located_at"
+    ],
+    [
+      16,
+      0,
+      "located_at"
+    ],
+    [
+      17,
+      0,
+      "located_at"
+    ],
+    [
+      18,
+      19,
+      "located_at"
+    ],
+    [
+      18,
+      20,
+      "located_at"
+    ],
+    [
+      21,
+      22,
+      "modify"
+    ],
+    [
+      22,
+      0,
+      "located_at"
+    ],
+    [
+      23,
+      10,
+      "modify"
+    ]
+  ]
+}
